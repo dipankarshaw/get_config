@@ -1,3 +1,13 @@
+"""
+This code helps user to collect show command Output's in very effective way.
+
+* Input
+    * List of nodes in hostname.txt file
+    * List of commands, whose output is to be collected, to be kept in commands.txt file.
+
+* Output
+    * Show output's are stored in a efficient folder structure.
+"""
 import getpass
 import datetime
 import os
@@ -12,7 +22,18 @@ os.mkdir(f"{formated_time}")
 
 
 def show_command_fun(ssh_device):
-    """show commands"""
+    """
+    :Purpose: This function takes one node Data.
+
+    :param ssh_device: IP/Name of the device.
+
+    * Logs into the node.
+        * creates the directory structure.
+        * collect show command output's & save them in text file.
+        * If exception happen then it generats a file saying not reachable.
+
+    :returns: Dictonary , containing the stats.
+    """
     ssh_device = ssh_device.strip()
     ssh_device1 = ssh_device.replace(".", "_")
     os.mkdir(f"{ssh_device1}")
@@ -46,13 +67,19 @@ def show_command_fun(ssh_device):
         with open(file_name, "w+", encoding='UTF-8') as file_open:
             file_open.write(f"{ssh_device} Device Not Rechable \n")
 
-
-username = input("Enter username : ")
-password = getpass.getpass("Enter Password : ")
-with open("commands.txt", encoding='UTF-8') as commands, open("hostname.txt",encoding='UTF-8') as hostnames:
-    commands_list = commands.readlines()
-    iq_device_list = hostnames.readlines()
-os.chdir(f"{file_path}/{formated_time}")
-with concurrent.futures.ThreadPoolExecutor(max_workers=50) as executor:
-    executor.map(show_command_fun, iq_device_list)
-print(f"**** Program Ended, get the outputs at : {file_path}/{formated_time}")
+if __name__ == "__main__":
+    """
+    Takes Input from user.
+    username : admin
+    password : 
+    Open's the Input files and call the show_command_fun using Concurrency.
+    """
+    username = input("Enter username : ")
+    password = getpass.getpass("Enter Password : ")
+    with open("commands.txt", encoding='UTF-8') as commands, open("hostname.txt",encoding='UTF-8') as hostnames:
+        commands_list = commands.readlines()
+        iq_device_list = hostnames.readlines()
+    os.chdir(f"{file_path}/{formated_time}")
+    with concurrent.futures.ThreadPoolExecutor(max_workers=50) as executor:
+        executor.map(show_command_fun, iq_device_list)
+    print(f"**** Program Ended, get the outputs at : {file_path}/{formated_time}")
